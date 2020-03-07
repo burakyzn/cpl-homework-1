@@ -23,6 +23,9 @@ import java.util.regex.Pattern;
 
 public class Analiz {
     private String metin;
+    private final String UrlRegexMetni = "((http?|https|ftp|file)://)?((W|w){3}.)?[a-zA-Z0-9]+\\.(com|edu|net|org)(\\.)?(tr)?";
+    private final String HarfRegexMetni = "[aeıiuüoö]";
+    private final String MailRegexMetni = "[a-zA-Z0-9_.]+\\@[a-zA-Z]+(\\.)([a-zA-Z]+)(\\.)?([a-zA-Z]+)?";
     
     private void setMetin(String p_metin){
         metin = p_metin.trim();
@@ -33,28 +36,37 @@ public class Analiz {
     }
     
     public void DosyaYukle(String dosyaYolu) throws FileNotFoundException{
-       Scanner fileIn = new Scanner(new File("icerik.txt"));
+        try{
+            Scanner fileIn = new Scanner(new File(dosyaYolu));
 
-       String okunanMetin = "";
-       while(fileIn.hasNext()){
-           okunanMetin += fileIn.next() + " ";
-       }
+            String okunanMetin = "";
+            while(fileIn.hasNext()){
+                okunanMetin += fileIn.next() + " ";
+            }
        
-       setMetin(okunanMetin);
+            setMetin(okunanMetin);
+        }catch(FileNotFoundException e){
+            System.out.println("Dosya yolu yanlış girildi.");
+            setMetin("");
+        }
     }
     
     public void AnaliziBaslat(){
-        System.out.println("Toplam Sesli Harf Sayısı : " + sesliHarfBul());
-        System.out.println("Toplam Kelime Sayısı     : " + kelimeBul());
-        System.out.println("Toplam Cümle Sayısı      : " + cumleBul());
-        System.out.println("Toplam Mail Sayısı       : " + mailBul());
-        System.out.println("Toplam Web Sitesi Sayısı : " + webSitesiBul());
+        if(!metin.equals("")){
+            System.out.println("Toplam Sesli Harf Sayısı : " + sesliHarfBul());
+            System.out.println("Toplam Kelime Sayısı     : " + kelimeBul());
+            System.out.println("Toplam Cümle Sayısı      : " + cumleBul());
+            System.out.println("Toplam Mail Sayısı       : " + mailBul());
+            System.out.println("Toplam Web Sitesi Sayısı : " + webSitesiBul());
+        } else {
+            System.out.println("Analizi yapılacak bir metin girilmedi.");
+        }
     }
     
     private int webSitesiBul(){
         String p_metin = getMetin();
         
-        Pattern urlRegex = Pattern.compile("((http?|https|ftp|file)://)?((W|w){3}.)?[a-zA-Z0-9]+\\.(com|edu|net|org)(\\.)?(tr)?");  
+        Pattern urlRegex = Pattern.compile(UrlRegexMetni);
         Matcher urlMatcher;
         int toplamURLSayisi = 0;
         
@@ -80,7 +92,7 @@ public class Analiz {
     
     private int sesliHarfBul(){
         String p_metin = getMetin();
-        Pattern sesliHarfRegex = Pattern.compile("[aeıiuüoö]", Pattern.CASE_INSENSITIVE);
+        Pattern sesliHarfRegex = Pattern.compile(HarfRegexMetni, Pattern.CASE_INSENSITIVE);
         Matcher SesliHarfMatcher = sesliHarfRegex.matcher(p_metin);
         int sesliHarfSayisi = 0;
         
@@ -94,7 +106,7 @@ public class Analiz {
     private int mailBul(){
         String p_metin = getMetin();
         
-        Pattern mailRegex = Pattern.compile("[a-zA-Z0-9]+\\@[a-zA-Z]+(\\.)([a-zA-Z]+)(\\.)?([a-zA-Z]+)?");  
+        Pattern mailRegex = Pattern.compile(MailRegexMetni);  
         Matcher mailMatcher;
         int toplamMailSayisi = 0;
         
@@ -118,12 +130,21 @@ public class Analiz {
         
         p_metin = mailTemizle(p_metin);
         p_metin = webSitesiTemizle(p_metin);
-     
-        return p_metin.split("\\.").length - 1;
+        int noktaSayisi = 0;
+        
+        char[] metin_karakterleri = p_metin.toCharArray();
+        
+        for(int i=0;i<metin_karakterleri.length;i++){
+            if(metin_karakterleri[i] == '.'){
+                noktaSayisi++;
+            }
+        }
+        
+        return noktaSayisi;
     }
     
     private String mailTemizle(String p_metin){
-        Pattern mailRegex = Pattern.compile("[a-zA-Z0-9]+\\@[a-zA-Z]+(\\.)([a-zA-Z]+)(\\.)?([a-zA-Z]+)?");  
+        Pattern mailRegex = Pattern.compile(MailRegexMetni);  
         Matcher mailMatcher;
         
         String[] kelimeListesi = p_metin.split(" ");
@@ -133,7 +154,11 @@ public class Analiz {
             
             if(mailMatcher.find()){
                 if(mail == null ? mailMatcher.group() == null : mail.equals(mailMatcher.group())){
-                    p_metin = p_metin.replace(mailMatcher.group(),"");
+                    if(mailMatcher.group().equals(kelimeListesi[kelimeListesi.length - 1]) && kelimeListesi[kelimeListesi.length - 1].toCharArray()[kelimeListesi[kelimeListesi.length - 1].toCharArray().length - 1] == '.'){
+                        p_metin = p_metin.replace(mailMatcher.group(), ".");
+                    } else {
+                        p_metin = p_metin.replace(mailMatcher.group(), "");
+                    }
                 }
             }
         }
@@ -142,7 +167,7 @@ public class Analiz {
     }
     
     private String webSitesiTemizle(String p_metin){
-        Pattern urlRegex = Pattern.compile("((http?|https|ftp|file)://)?((W|w){3}.)?[a-zA-Z0-9]+\\.[a-zA-Z]+(\\.)?([a-zA-Z]+)?");  
+        Pattern urlRegex = Pattern.compile(UrlRegexMetni);  
         Matcher urlMatcher;
         
         String[] kelimeListesi = p_metin.split(" ");
@@ -152,7 +177,11 @@ public class Analiz {
             
             if(urlMatcher.find()){
                 if(URL == null ? urlMatcher.group() == null : URL.equals(urlMatcher.group())){
-                    p_metin = p_metin.replace(urlMatcher.group(), "");
+                    if(urlMatcher.group().equals(kelimeListesi[kelimeListesi.length - 1]) && kelimeListesi[kelimeListesi.length - 1].toCharArray()[kelimeListesi[kelimeListesi.length - 1].toCharArray().length - 1] == '.'){
+                        p_metin = p_metin.replace(urlMatcher.group(), ".");
+                    } else {
+                        p_metin = p_metin.replace(urlMatcher.group(), "");
+                    }
                 }
             }
         }
