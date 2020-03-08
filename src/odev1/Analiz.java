@@ -46,11 +46,6 @@ public class Analiz {
         if(kelimeListesi.equals("") || ((kelimeListesi.length - 1)  == 0 && kelimeListesi[0] == "")){
             System.out.println("Analizi yapılacak bir metin girilmedi.");
         } else {
-            
-            for(int i=0;i<kelimeListesi.length;i++){
-                System.out.println(kelimeListesi[i]);
-            }
-            
             int sesliHarfSayisi = sesliHarfBul();
             int kelimeSayisi = kelimeBul();
             int mailSayisi = mailBul();
