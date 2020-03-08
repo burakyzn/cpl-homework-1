@@ -1,30 +1,18 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * @author Burak Yazan <burak.yazan@ogr.sakarya.edu.tr>
+ * @since 08/03/2020
+ * <p> Odev sinifi projenin ana baslangic sinifir. </p>
  */
 package odev1;
 
 import java.io.FileNotFoundException;
 
-/**
-*
-* @author Burak Yazan <burak.yazan@sakarya.edu.tr>
-* @since 2/27/2020
-* <p>
-* Odev1 sinifi projenin ana sinifidir.
-* </p>
-*/
 public class Odev1 {
 
-    /**
-     * @param args the command line arguments
-     * @throws java.io.FileNotFoundException
-     */
+
     public static void main(String[] args) throws FileNotFoundException {
-        // TODO code application logic here
-        Analiz MetinDosyam = new Analiz();
-        MetinDosyam.DosyaYukle("icerik.txt");
-        MetinDosyam.AnaliziBaslat();
+        Analiz MetinDosyam = new Analiz(); // analiz sinifindan bir nesne uretiyorum.
+        MetinDosyam.DosyaYukle("icerik.txt"); // urettigim bu nesneye analiz etmek istedigim dosyanin yolunu gonderiyorum.
+        MetinDosyam.AnaliziBaslat(); // burada nesne uzerinde analizi baslatiyorum.
     }
 }

@@ -1,7 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * @author Burak Yazan <burak.yazan@ogr.sakarya.edu.tr>
+ * @since 08/03/2020
+ * <p> Analiz sinifi disaridan aldigi dosya yolundaki dosyayi okur icerigindeki metni analiz eder ve cikti uretir. </p>
  */
 package odev1;
 
@@ -11,30 +11,27 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
-*
-* @author Burak Yazan <burak.yazan@sakarya.edu.tr>
-* @since 2/27/2020
-* <p>
-* Analiz sinifi aldigi dosyanin sesli harf 
-* kelime cumle mail web sitesi analizini yapar.
-* </p>
-*/
-
 public class Analiz {
-    private String metin;
+    private String metin; // nesnenin tuttugu ana metindir.
+    // websitelerini ayirt etmek icin kullandigim regex cumlesi.
     private final String UrlRegexMetni = "((http?|https|ftp|file)://)?((W|w){3}.)?[a-zA-Z0-9]+\\.(com|edu|net|org)(\\.)?(tr)?";
+    // sesli harfleri ayirt etmek icin kullandigim regex cumlesi
     private final String HarfRegexMetni = "[aeıiuüoö]";
+    // mail adreslerini ayirt etmek icin kullandigim regex cumlesi
     private final String MailRegexMetni = "[a-zA-Z0-9_.]+\\@[a-zA-Z]+(\\.)([a-zA-Z]+)(\\.)?([a-zA-Z]+)?";
     
+    // metin degiskenini ayarlamak icin bu fonksiyon kullanılıyor.
     private void setMetin(String p_metin){
         metin = p_metin.trim();
     }
     
+    // metin degiskeni cagrilirken bu fonksiyon kullaniliyor.
     private String getMetin(){
         return metin;
     }
     
+    // disaridan cagrilan DosyaYukle methodu aldigi dosya yolundaki dosyanin icindeki metni 
+    // nesnin icerisine aktariyor. Eger dosya soylenen yerde yok ise kullaniciya hata donuluyor.
     public void DosyaYukle(String dosyaYolu) throws FileNotFoundException{
         try{
             Scanner fileIn = new Scanner(new File(dosyaYolu));
@@ -51,6 +48,8 @@ public class Analiz {
         }
     }
     
+    // disaridan cagrilan analizi baslat sinifi metin uzerindeki analiz islemlerini baslatiyor ve ciktilari yazdiriyor.
+    // eger kullanicinin gostermis oldugu dosya bos ise kullaniciya bilgilendirme mesajı donuyor ve islem bitiyor.
     public void AnaliziBaslat(){
         if(!metin.equals("")){
             System.out.println("Toplam Sesli Harf Sayısı : " + sesliHarfBul());
@@ -63,6 +62,7 @@ public class Analiz {
         }
     }
     
+    // UrlRegexMetni ne gore metin icerisindeki web site linklerinin analizini yapiyor.
     private int webSitesiBul(){
         String p_metin = getMetin();
         
@@ -85,11 +85,13 @@ public class Analiz {
         return toplamURLSayisi;
     }
     
+    // metnin kelime sayisini bosluklara gore hesaplayıp donduruyor.
     private int kelimeBul(){
         String p_metin = getMetin();
         return p_metin.split(" ").length;
     }
     
+    // HarfRegexMetni ne gore metin icerisindeki sesli harflerin analizini yapiyor.
     private int sesliHarfBul(){
         String p_metin = getMetin();
         Pattern sesliHarfRegex = Pattern.compile(HarfRegexMetni, Pattern.CASE_INSENSITIVE);
@@ -103,6 +105,7 @@ public class Analiz {
         return sesliHarfSayisi;
     }
     
+    // mailRegexMetni ne gore metin icerisindeki mail adreslerinin analizini yapiyor.
     private int mailBul(){
         String p_metin = getMetin();
         
@@ -125,6 +128,8 @@ public class Analiz {
         return toplamMailSayisi;
     }
     
+    // bu fonksiyon cumle icerisindeki web sitelerinin ve mail adreslerinin silinmesinden sonra
+    // metindeki cumle sayisini buluyor ve geri donduruyor.
     private int cumleBul(){
         String p_metin = getMetin();
         
@@ -143,6 +148,7 @@ public class Analiz {
         return noktaSayisi;
     }
     
+    // MailRegexMetni ne gore metin icerisindeki mail adreslerini bulup metnin icerisinden siliyor.
     private String mailTemizle(String p_metin){
         Pattern mailRegex = Pattern.compile(MailRegexMetni);  
         Matcher mailMatcher;
@@ -166,6 +172,7 @@ public class Analiz {
         return p_metin;
     }
     
+    // UrlRegexMetni ne gore metin icerisindeki web adreslerini bulup metnin icerisinden siliyor.
     private String webSitesiTemizle(String p_metin){
         Pattern urlRegex = Pattern.compile(UrlRegexMetni);  
         Matcher urlMatcher;
